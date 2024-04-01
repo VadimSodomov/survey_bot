@@ -9,14 +9,14 @@ from keyboards.inline import get_continue_add_question_keyboard
 
 @bot.callback_query_handler(func=lambda callback: callback.data == "add_question")
 def add_question(callback: telebot.types.CallbackQuery):
-    bot.send_message(callback.message.chat.id, "Введи, пожалуйста, вопрос:")
+    bot.send_message(callback.message.chat.id, "Введи, пожалуйста, вопрос: 💬")
     bot.set_state(callback.from_user.id, States.wait_question, callback.message.chat.id)
 
 
 @bot.message_handler(state=States.wait_question)
 def wait_question(message: telebot.types.Message):
     add_question_to_db(question_text=message.text, telegram_id=message.from_user.id, publish_date=datetime.datetime.now())
-    bot.send_message(message.chat.id, "Вопрос успешно добавлен! Введи, пожалуйста, варианты ответов)\nОни должны быть написаны в одном сообщении. Каждый ответ нужно вводить с новой строки (для перехода на новую строку 'Shift'+'Enter'))")
+    bot.send_message(message.chat.id, "Вопрос успешно добавлен! 👍\n\nВведи, пожалуйста, в одном сообщении варианты ответов) Каждый ответ нужно вводить с новой строки 😉")
     bot.set_state(message.from_user.id, States.wait_choice, message.chat.id)
 
 
@@ -27,5 +27,5 @@ def wait_choice(message: telebot.types.Message):
     for choice in choices:
         add_choices_to_db(choice_text=choice, votes=0, question_id=id_last_question)
     markup = get_continue_add_question_keyboard()
-    bot.send_message(message.chat.id, "Варианты ответа успешно добавлены!", reply_markup=markup)
+    bot.send_message(message.chat.id, "Варианты ответа успешно добавлены! 💫", reply_markup=markup)
     bot.delete_state(message.from_user.id, message.chat.id)

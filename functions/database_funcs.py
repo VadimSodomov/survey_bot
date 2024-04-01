@@ -239,7 +239,7 @@ def get_all_stats_db() -> str:
             choices.append(f'{j[0]} -- {j[1]}')
         str_choices = "\n- ".join(choices)
         text_list.append(
-            f'{i+1}) {q[1]}\nПринявших участие: {q[2]}\nОтветы:\n- {str_choices}'
+            f'🔹 {i+1}. {q[1]}\nПринявших участие: {q[2]}\nОтветы:\n- {str_choices}'
         )
     return "\n\n".join(text_list)
 

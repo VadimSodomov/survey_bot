@@ -21,14 +21,14 @@ def start_help(user_id, username, chat_id):
         markup = get_admin_keyboard()
         bot.send_message(
             chat_id,
-            f'\U0001F4A5Версия для админов\U0001F4A5\n{get_welcome(username)} Я бот для опросов \U0001F31F',
+            f'\U0001F4A5Версия для админов\U0001F4A5\n\n{get_welcome(username)}\nЯ бот для опросов)',
             reply_markup=markup
         )
     else:
         markup = get_default_keyboard()
         bot.send_message(
             chat_id,
-            f'{get_welcome(username)} Я бот для опросов \U0001F31F',
+            f'{get_welcome(username)}\nЯ бот для опросов \U0001F31F',
             reply_markup=markup
         )
 

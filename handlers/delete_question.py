@@ -10,10 +10,10 @@ def delete_question(callback: telebot.types.CallbackQuery):
     all_questions_and_id = get_all_questions_db()
     if all_questions_and_id:
         questions_id = [q[0] for q in all_questions_and_id]
-        questions_text = [f'{i+1}) {q[1]}' for i, q in enumerate(all_questions_and_id)]
+        questions_text = [f'▫ {i+1}. {q[1]}' for i, q in enumerate(all_questions_and_id)]
         text = '\n'.join(questions_text)
         markup = numbers_questions_delete_keyboard(questions_id)
-        bot.send_message(callback.message.chat.id, f'Выберите вопросы, которые хотите удалить)\n{text}', reply_markup=markup)
+        bot.send_message(callback.message.chat.id, f'Выберите вопросы, которые хотите удалить ❎\n{text}', reply_markup=markup)
     else:
         bot.send_message(callback.message.chat.id, "На данный момент не создано ни одного вопроса. Удалять нечего)")
 

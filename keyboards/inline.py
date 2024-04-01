@@ -1,16 +1,18 @@
 import telebot
 from telebot.types import InlineKeyboardMarkup, InlineKeyboardButton
 
+from smilies import smilies
+
 
 def get_admin_keyboard():
     markup = InlineKeyboardMarkup()
     markup.row_width = 2
     markup.add(
-        InlineKeyboardButton(text="Пройти опрос", callback_data="get_survey"),
-        InlineKeyboardButton(text="Личная статистика", callback_data="my_stats"),
-        InlineKeyboardButton(text="Общая статистика", callback_data="all_stats"),
-        InlineKeyboardButton(text="Создать вопрос", callback_data="add_question"),
-        InlineKeyboardButton(text="Удалить вопрос", callback_data="delete_question")
+        InlineKeyboardButton(text=f"{smilies['checkbox']} Пройти опрос", callback_data="get_survey"),
+        InlineKeyboardButton(text=f"{smilies['statistic']} Личная статистика", callback_data="my_stats"),
+        InlineKeyboardButton(text=f"{smilies['all_statistic']} Общая статистика", callback_data="all_stats"),
+        InlineKeyboardButton(text=f"{smilies['pencil']} Создать вопрос", callback_data="add_question"),
+        InlineKeyboardButton(text=f"{smilies['delete']} Удалить вопрос", callback_data="delete_question")
     )
     return markup
 
@@ -19,8 +21,8 @@ def get_default_keyboard():
     markup = InlineKeyboardMarkup()
     markup.row_width = 2
     markup.add(
-        InlineKeyboardButton(text="Пройти опрос", callback_data="get_survey"),
-        InlineKeyboardButton(text="Личная статистика", callback_data="my_stats")
+        InlineKeyboardButton(text=f"{smilies['checkbox']} Пройти опрос", callback_data="get_survey"),
+        InlineKeyboardButton(text=f"{smilies['statistic']} Личная статистика", callback_data="my_stats")
     )
     return markup
 
@@ -29,28 +31,27 @@ def get_continue_add_question_keyboard():
     markup = InlineKeyboardMarkup()
     markup.row_width = 1
     markup.add(
-        InlineKeyboardButton(text="Ввести следующий вопрос", callback_data="add_question"),
-        InlineKeyboardButton(text="Выйти в меню", callback_data="/start")
+        InlineKeyboardButton(text=f"{smilies['pencil']} Ввести следующий вопрос", callback_data="add_question"),
+        InlineKeyboardButton(text="◀ Выйти в меню", callback_data="/start")
     )
     return markup
 
 
 def get_start_survey_keyboard():
     markup = InlineKeyboardMarkup()
-    markup.add(InlineKeyboardButton(text="Начать прохождение", callback_data="start_survey"))
+    markup.add(InlineKeyboardButton(text="➡ Начать прохождение", callback_data="start_survey"))
     return markup
 
 
 def get_continue_survey_keyboard():
     markup = InlineKeyboardMarkup()
-    markup.add(InlineKeyboardButton(text="Продолжить прохождение", callback_data="start_survey"))
+    markup.add(InlineKeyboardButton(text="➡ Продолжить прохождение", callback_data="start_survey"))
     return markup
 
 
 def get_choices_markup(choices):
     markup = InlineKeyboardMarkup()
     markup.row_width = 1
-    print(choices)
     for choice in choices:
         choice_id = choice.split(", ")[0]
         markup.add(InlineKeyboardButton(text=choice.split(", ")[1], callback_data=f'c{choice_id}'))
@@ -58,7 +59,6 @@ def get_choices_markup(choices):
 
 
 def numbers_questions_delete_keyboard(questions_id, k=0):
-    #print(questions_id)
     d = {}
     r = 8
     if k > 0:

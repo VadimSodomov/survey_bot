@@ -17,20 +17,20 @@ def get_survey(callback: telebot.types.CallbackQuery):
             markup = get_continue_survey_keyboard()
             bot.send_message(
                 callback.message.chat.id,
-                f'Ранее ты уже ответил на {len(answered_questions)}/{len(all_questions)} вопросов',
+                f'Ранее ты уже ответил на {len(answered_questions)}/{len(all_questions)} вопросов 😉',
                 reply_markup=markup
             )
         else:
             markup = get_start_survey_keyboard()
             bot.send_message(
                 callback.message.chat.id,
-                f'Отлично) Опрос состоит из {len(questions)} вопросов',
+                f'Опрос состоит из {len(questions)} вопросов) Будем рады вашему прохождению! ☺',
                 reply_markup=markup
             )
     else:
         bot.send_message(
             callback.message.chat.id,
-            'Ты ответил на все вопросы) Спасибо за прохождение опроса!'
+            'Ты ответил на все вопросы 👍\nСпасибо за прохождение опроса! 😉'
         )
         bot.delete_state(callback.from_user.id, callback.message.chat.id)
 
@@ -43,7 +43,7 @@ def send_question(user_id, chat_id, message_id):
         markup = get_choices_markup(choices=current_choices)  # template_call_data: "number, answer"
         bot.edit_message_reply_markup(chat_id=chat_id, message_id=message_id, reply_markup=None)
         bot.send_message(
-            text=f'{cnt_answered + 1}) {current_question["text"]}',
+            text=f'🔸 {cnt_answered + 1}. {current_question["text"]}',
             chat_id=chat_id,
             reply_markup=markup
         )
@@ -51,7 +51,7 @@ def send_question(user_id, chat_id, message_id):
         bot.edit_message_reply_markup(chat_id=chat_id, message_id=message_id, reply_markup=None)
         bot.send_message(
             chat_id,
-            'Ты ответил на все вопросы) Спасибо за прохождение опроса!'
+            'Ты ответил на все вопросы 👍\nСпасибо за прохождение опроса! 😉'
         )
         bot.delete_state(user_id, chat_id)
 

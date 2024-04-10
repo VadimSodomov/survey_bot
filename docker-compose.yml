@@ -2,7 +2,7 @@ version: "3.3"
 services:
 
   db:
-    restart: always
+    restart: unless-stopped
     image: postgres:15.2
     env_file:
       - .env
@@ -17,3 +17,10 @@ services:
     # network_mode: 'host'
     ports:
       - ${PORT}:5432
+  bot:
+    build: .
+    image: bot
+    restart: unless-stopped
+    env_file: .env
+    depends_on:
+      - db

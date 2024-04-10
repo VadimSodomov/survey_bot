@@ -3,19 +3,24 @@ import os
 import psycopg2
 
 
-def ConnectToDataBase():
-    connection = psycopg2.connect(
-        dbname=os.getenv("DBNAME"),
-        user=os.getenv("USER"),
-        password=os.getenv("PASSWORD"),
-        port=int(os.getenv("PORT")),
-        host=os.getenv("HOST")
-    )
-    return connection
+def connect_to_database(func):
+    def wrapper(*args, **kwargs):
+        connection = psycopg2.connect(
+            dbname=os.getenv("DBNAME"),
+            user=os.getenv("USER"),
+            password=os.getenv("PASSWORD"),
+            port=int(os.getenv("PORT")),
+            host=os.getenv("HOST")
+        )
+        f = func(*args, **kwargs, connection=connection)
+        connection.commit()
+        connection.close()
+        return f
+    return wrapper
 
 
-def create_tables_from_db():
-    connection = ConnectToDataBase()
+@connect_to_database
+def create_tables_from_db(connection=None):
     with connection.cursor() as cursor:
         cursor.execute(
             """
@@ -54,66 +59,54 @@ def create_tables_from_db():
         );
             """
         )
-    connection.commit()
-    connection.close()
 
 
-def add_admin_to_db(telegram_id: int, name: str):
-    connection = ConnectToDataBase()
+@connect_to_database
+def add_admin_to_db(telegram_id: int, name: str, connection=None):
     with connection.cursor() as cursor:
-        cursor.execute("SELECT admins.telegram_id FROM admins WHERE admins.telegram_id = (%s)", (telegram_id,))
+        cursor.execute("SELECT admins.telegram_id FROM admins WHERE admins.telegram_id = (%s)", (telegram_id, ))
         admins_db = cursor.fetchone()
         if not admins_db:
             cursor.execute("INSERT INTO admins (telegram_id, name) VALUES ((%s), (%s))", (telegram_id, name))
-    connection.commit()
-    connection.close()
 
 
-def get_admin_id(telegram_id):
-    connection = ConnectToDataBase()
+@connect_to_database
+def get_admin_id(telegram_id, connection=None):
     with connection.cursor() as cursor:
-        cursor.execute("SELECT id FROM admins WHERE telegram_id = (%s)", (telegram_id,))
+        cursor.execute("SELECT id FROM admins WHERE telegram_id = (%s)", (telegram_id, ))
         admin_id = cursor.fetchone()
-    connection.commit()
-    connection.close()
     return admin_id[0]
 
 
-def add_question_to_db(question_text, telegram_id, publish_date):
-    connection = ConnectToDataBase()
+@connect_to_database
+def add_question_to_db(question_text, telegram_id, publish_date, connection=None):
     admin_id = get_admin_id(telegram_id)
     with connection.cursor() as cursor:
         cursor.execute(
-            "INSERT INTO questions (question_text, admin_id, publish_date) VALUES ((%s),(%s),(%s))",
+            "INSERT INTO questions (question_text, admin_id, publish_date) VALUES ((%s), (%s), (%s))",
             (question_text, admin_id, publish_date)
         )
-    connection.commit()
-    connection.close()
 
 
-def get_id_last_question_db():
-    connection = ConnectToDataBase()
+@connect_to_database
+def get_id_last_question_db(connection=None):
     with connection.cursor() as cursor:
         cursor.execute("SELECT MAX(id) FROM questions")
         id_last = cursor.fetchone()
-    connection.commit()
-    connection.close()
     return id_last[0]
 
 
-def add_choices_to_db(choice_text, votes, question_id):
-    connection = ConnectToDataBase()
+@connect_to_database
+def add_choices_to_db(choice_text, question_id, connection=None):
     with connection.cursor() as cursor:
         cursor.execute(
-            "INSERT INTO choice (choice_text, votes, question_id) VALUES ((%s),(%s),(%s))",
-            (choice_text, votes, question_id)
+            "INSERT INTO choice (choice_text, votes, question_id) VALUES ((%s), (%s), (%s))",
+            (choice_text, 0, question_id)
         )
-    connection.commit()
-    connection.close()
 
 
-def get_questions_answered_user_db(telegram_id, for_stats=False):
-    connection = ConnectToDataBase()
+@connect_to_database
+def get_questions_answered_user_db(telegram_id, for_stats=False, connection=None):
     with connection.cursor() as cursor:
         cursor.execute(
             """
@@ -126,39 +119,32 @@ def get_questions_answered_user_db(telegram_id, for_stats=False):
             questions = [q[1:] for q in cursor.fetchall()]
         else:
             questions = [q[0] for q in cursor.fetchall()]
-    connection.commit()
-    connection.close()
     return questions
 
 
-def get_questions_for_user_db(answered_questions=None):
-    connection = ConnectToDataBase()
+@connect_to_database
+def get_questions_for_user_db(answered_questions=None, connection=None):
     with connection.cursor() as cursor:
         if answered_questions:
-            cursor.execute("SELECT question_id FROM choice WHERE question_id > (%s)", (max(answered_questions),))
-            questions = list(set([q[0] for q in cursor.fetchall()]))
+            cursor.execute("SELECT question_id FROM choice WHERE question_id > (%s)", (max(answered_questions), ))
         else:
             cursor.execute("SELECT question_id FROM choice")
-            questions = list(set([q[0] for q in cursor.fetchall()]))
-    connection.commit()
-    connection.close()
+        questions = list(set([q[0] for q in cursor.fetchall()]))
     return questions
 
 
-def last_answered_question_db(telegram_id):
-    connection = ConnectToDataBase()
+@connect_to_database
+def get_last_answered_question_db(telegram_id, connection=None):
     with connection.cursor() as cursor:
-        cursor.execute("SELECT question_id FROM user_statistics WHERE telegram_id = (%s)", (telegram_id,))
+        cursor.execute("SELECT question_id FROM user_statistics WHERE telegram_id = (%s)", (telegram_id, ))
         questions = [q[0] for q in cursor.fetchall()]
-    connection.commit()
-    connection.close()
     if questions:
         return [len(questions), questions[-1]]
     return [0, 0]
 
 
-def get_current_question_db(last):
-    connection = ConnectToDataBase()
+@connect_to_database
+def get_current_question_db(last, connection=None):
     with connection.cursor() as cursor:
         cursor.execute("""
         SELECT choice.question_id, questions.question_text FROM choice
@@ -166,48 +152,41 @@ def get_current_question_db(last):
         WHERE choice.question_id > (%s)
         ORDER BY questions.id""", (last,))
         question = cursor.fetchone()
-    connection.commit()
-    connection.close()
     if question:
         dict_question = dict(id=question[0], text=question[1])
         return dict_question
     return None
 
 
-def get_current_choices(question_id):
-    connection = ConnectToDataBase()
+@connect_to_database
+def get_current_choices(question_id, connection=None):
     with connection.cursor() as cursor:
-        cursor.execute("SELECT id, choice_text FROM choice WHERE question_id = (%s)", (question_id,))
+        cursor.execute("SELECT id, choice_text FROM choice WHERE question_id = (%s)", (question_id, ))
         choices = cursor.fetchall()
-    connection.commit()
-    connection.close()
-    # dict_choices = {}
     string_choices = []
     for choice in sorted(choices):
         string_choices.append(f'{choice[0]}, {choice[1]}')
     return string_choices
 
 
-def add_user_vote_db(choice_id, telegram_id):
-    connection = ConnectToDataBase()
+@connect_to_database
+def add_user_vote_db(choice_id, telegram_id, connection=None):
     with connection.cursor() as cursor:
         cursor.execute("""
         UPDATE choice
         SET votes = votes + 1
         WHERE id = (%s)
         """, (choice_id, ))
-        cursor.execute("SELECT question_id FROM choice WHERE id = (%s)", (choice_id,))
+        cursor.execute("SELECT question_id FROM choice WHERE id = (%s)", (choice_id, ))
         question_id = cursor.fetchone()[0]
         cursor.execute(
             "INSERT INTO user_statistics (telegram_id, question_id, choice_id) VALUES ((%s), (%s), (%s))",
             (telegram_id, question_id, choice_id)
         )
-    connection.commit()
-    connection.close()
 
 
-def get_all_stats_db() -> str:
-    connection = ConnectToDataBase()
+@connect_to_database
+def get_all_stats_db(connection=None) -> str:
     with connection.cursor() as cursor:
         cursor.execute(
             """
@@ -226,12 +205,9 @@ def get_all_stats_db() -> str:
                 JOIN questions on questions.id = choice.question_id
                 WHERE choice.question_id = (%s)
                 ORDER BY choice.id
-                """,
-                (q[0], )
+                """, (q[0], )
             )
             choice_votes.append(cursor.fetchall())
-    connection.commit()
-    connection.close()
     text_list = []
     for i, q in enumerate(id_text_votes):
         choices = []
@@ -244,31 +220,27 @@ def get_all_stats_db() -> str:
     return "\n\n".join(text_list)
 
 
-def get_all_questions_db(first_id=None, last_id=None):
-    connection = ConnectToDataBase()
+@connect_to_database
+def get_all_questions_db(first_id=None, last_id=None, connection=None):
     with connection.cursor() as cursor:
         if first_id and not last_id:
             cursor.execute("SELECT id, question_text FROM questions WHERE id >= (%s)", (first_id, ))
             result = cursor.fetchall()
         if last_id and not first_id:
-            cursor.execute("SELECT id, question_text FROM questions WHERE id <= (%s)", (last_id,))
+            cursor.execute("SELECT id, question_text FROM questions WHERE id <= (%s)", (last_id, ))
             result = cursor.fetchall()
         if first_id and last_id:
-            cursor.execute("SELECT id, question_text FROM questions WHERE id <= (%s)", (last_id,))
+            cursor.execute("SELECT id, question_text FROM questions WHERE id <= (%s)", (last_id, ))
             result = cursor.fetchall()
         if not first_id and not last_id:
             cursor.execute("SELECT id, question_text FROM questions")
             result = cursor.fetchall()
-    connection.commit()
-    connection.close()
     return result
 
 
-def delete_question_by_id_db(question_id):
-    connection = ConnectToDataBase()
+@connect_to_database
+def delete_question_by_id_db(question_id, connection=None):
     with connection.cursor() as cursor:
         cursor.execute("DELETE FROM user_statistics WHERE question_id = (%s)", (question_id, ))
         cursor.execute("DELETE FROM choice WHERE question_id = (%s)", (question_id, ))
         cursor.execute("DELETE FROM questions WHERE id = (%s)", (question_id, ))
-    connection.commit()
-    connection.close()

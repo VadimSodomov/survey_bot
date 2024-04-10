@@ -1,6 +1,7 @@
 import datetime
 from smilies import smilies
 
+
 def get_welcome(name) -> str:
     current_time = datetime.datetime.now()
     if 23 <= current_time.hour or current_time.hour < 5:

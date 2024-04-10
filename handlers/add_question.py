@@ -25,7 +25,7 @@ def wait_choice(message: telebot.types.Message):
     choices = message.text.split('\n')
     id_last_question = get_id_last_question_db()
     for choice in choices:
-        add_choices_to_db(choice_text=choice, votes=0, question_id=id_last_question)
+        add_choices_to_db(choice_text=choice, question_id=id_last_question)
     markup = get_continue_add_question_keyboard()
     bot.send_message(message.chat.id, "Варианты ответа успешно добавлены! 💫", reply_markup=markup)
     bot.delete_state(message.from_user.id, message.chat.id)

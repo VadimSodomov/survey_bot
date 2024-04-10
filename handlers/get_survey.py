@@ -1,7 +1,7 @@
 import telebot.types
 
 from functions.database_funcs import get_questions_answered_user_db, get_questions_for_user_db, \
-    last_answered_question_db, get_current_question_db, get_current_choices, add_user_vote_db
+    get_last_answered_question_db, get_current_question_db, get_current_choices, add_user_vote_db
 from handlers.user import States
 from init_bot import bot
 from keyboards.inline import get_start_survey_keyboard, get_continue_survey_keyboard, get_choices_markup
@@ -36,7 +36,7 @@ def get_survey(callback: telebot.types.CallbackQuery):
 
 
 def send_question(user_id, chat_id, message_id):
-    cnt_answered, last = last_answered_question_db(telegram_id=user_id)
+    cnt_answered, last = get_last_answered_question_db(telegram_id=user_id)
     current_question = get_current_question_db(last)  # {id:, text:}
     if current_question:
         current_choices = get_current_choices(current_question["id"])  # -> ["id, text", ]

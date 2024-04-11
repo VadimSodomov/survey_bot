@@ -1,26 +1,32 @@
 version: "3.3"
 services:
-
   db:
     restart: unless-stopped
     image: postgres:15.2
     env_file:
       - .env
     environment:
-      POSTGRES_USER: ${USER}
+      POSTGRES_USER: ${DBUSER}
       POSTGRES_PASSWORD: ${PASSWORD}
       POSTGRES_DB: ${DBNAME}
     volumes:
-      - ./pgdata:/var/lib/postgresql/data
+      - db-data:/data/db/
+      # - ./pgdata:/var/lib/postgresql/data
       # - ./database.sql:/docker-entrypoint-initdb.d/database.sql
       # - ./new_database.sql:/docker-entrypoint-initdb.d/new_database.sql
     # network_mode: 'host'
-    ports:
-      - ${PORT}:5432
+    #ports:
+     # - ${PORT}:5432
   bot:
-    build: .
+    build:
+      context: .
+      dockerfile: Dockerfile
     image: bot
     restart: unless-stopped
+    #command: python main.py
     env_file: .env
     depends_on:
       - db
+
+volumes:
+  db-data:

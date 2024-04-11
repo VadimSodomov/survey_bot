@@ -7,7 +7,7 @@ def connect_to_database(func):
     def wrapper(*args, **kwargs):
         connection = psycopg2.connect(
             dbname=os.getenv("DBNAME"),
-            user=os.getenv("USER"),
+            user=os.getenv("DBUSER"),
             password=os.getenv("PASSWORD"),
             port=int(os.getenv("PORT")),
             host=os.getenv("HOST")

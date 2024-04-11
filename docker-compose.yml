@@ -10,7 +10,7 @@ services:
       POSTGRES_PASSWORD: ${PASSWORD}
       POSTGRES_DB: ${DBNAME}
     volumes:
-      - db-data:/data/db/
+      - db-data:/var/lib/postgresql/data
       # - ./pgdata:/var/lib/postgresql/data
       # - ./database.sql:/docker-entrypoint-initdb.d/database.sql
       # - ./new_database.sql:/docker-entrypoint-initdb.d/new_database.sql

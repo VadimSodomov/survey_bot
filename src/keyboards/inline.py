@@ -1,7 +1,7 @@
 import telebot
 from telebot.types import InlineKeyboardMarkup, InlineKeyboardButton
 
-from smilies import smilies
+from src.smilies import smilies
 
 
 def get_admin_keyboard():

@@ -3,10 +3,10 @@ import os
 
 from telebot.handler_backends import StatesGroup, State
 
-from functions.database_funcs import add_admin_to_db
-from functions.datetime_funcs import get_welcome
-from init_bot import bot
-from keyboards.inline import get_admin_keyboard, get_default_keyboard
+from src.functions.database_funcs import add_admin_to_db
+from src.functions.datetime_funcs import get_welcome
+from src.init_bot import bot
+from src.keyboards.inline import get_admin_keyboard, get_default_keyboard
 
 
 class States(StatesGroup):

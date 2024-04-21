@@ -1,10 +1,10 @@
 import telebot.types
 import datetime
 
-from functions.database_funcs import add_question_to_db, get_id_last_question_db, add_choices_to_db
-from handlers.user import States
-from init_bot import bot
-from keyboards.inline import get_continue_add_question_keyboard
+from src.functions.database_funcs import add_question_to_db, get_id_last_question_db, add_choices_to_db
+from src.handlers.user import States
+from src.init_bot import bot
+from src.keyboards.inline import get_continue_add_question_keyboard
 
 
 @bot.callback_query_handler(func=lambda callback: callback.data == "add_question")

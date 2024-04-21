@@ -1,8 +1,8 @@
 import telebot.types
 
-from functions.database_funcs import get_questions_answered_user_db, get_questions_for_user_db
-from init_bot import bot
-from smilies import smilies
+from src.functions.database_funcs import get_questions_answered_user_db, get_questions_for_user_db
+from src.init_bot import bot
+from src.smilies import smilies
 
 
 @bot.callback_query_handler(func=lambda callback: callback.data == 'my_stats')

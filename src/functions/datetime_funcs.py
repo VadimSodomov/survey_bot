@@ -1,5 +1,5 @@
 import datetime
-from smilies import smilies
+from src.smilies import smilies
 
 
 def get_welcome(name) -> str:

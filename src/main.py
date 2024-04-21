@@ -1,8 +1,8 @@
 import telebot
 
-from functions.database_funcs import create_tables_from_db
-from handlers import register_handlers
-from init_bot import bot
+from src.functions.database_funcs import create_tables_from_db
+from src.handlers import register_handlers
+from src.init_bot import bot
 
 if __name__ == '__main__':
     create_tables_from_db()

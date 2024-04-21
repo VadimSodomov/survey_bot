@@ -1,8 +1,8 @@
 import telebot.types
 
-from src.functions.database_funcs import get_all_questions_db, delete_question_by_id_db
-from src.init_bot import bot
-from src.keyboards.inline import numbers_questions_delete_keyboard
+from functions.database_funcs import get_all_questions_db, delete_question_by_id_db
+from init_bot import bot
+from keyboards.inline import numbers_questions_delete_keyboard
 
 
 @bot.callback_query_handler(func=lambda callback: callback.data == "delete_question")

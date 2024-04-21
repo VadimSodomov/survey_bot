@@ -1,7 +1,7 @@
 import telebot.types
 
-from src.functions.database_funcs import get_all_stats_db
-from src.init_bot import bot
+from functions.database_funcs import get_all_stats_db
+from init_bot import bot
 
 
 @bot.callback_query_handler(func=lambda callback: callback.data == "all_stats")
